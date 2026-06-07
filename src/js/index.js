@@ -1,4 +1,4 @@
-import Game from "./scenes/Game.js";
+import Game from "../scenes/Game.js";
 
 // Create a new Phaser config object
 const config = {
