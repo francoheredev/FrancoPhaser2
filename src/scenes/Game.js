@@ -10,11 +10,11 @@ export default class Game extends Phaser.Scene {
   }
 
   preload() {
-    this.load.tilemapTiledJSON("map", "public/assets/tilemap/map.json");
-    this.load.image("tileset", "public/assets/texture.png");
-    this.load.image("star", "public/assets/star.png");
+    this.load.tilemapTiledJSON("map", "public/assets/tilemaps/map.json");
+    this.load.image("tileset", "public/assets/images/texture.png");
+    this.load.image("star", "public/assets/images/star.png");
 
-    this.load.spritesheet("dude", "./public/assets/dude.png", {
+    this.load.spritesheet("dude", "public/assets/images/dude.png", {
       frameWidth: 32,
       frameHeight: 48,
     });
@@ -147,12 +147,5 @@ export default class Game extends Phaser.Scene {
 
     this.score += 10;
     this.scoreText.setText(`Score: ${this.score}`);
-
-    if (this.stars.countActive(true) === 0) {
-      //  A new batch of stars to collect
-      this.stars.children.iterate(function (child) {
-        child.enableBody(true, child.x, 0, true, true);
-      });
-    }
   }
 }
