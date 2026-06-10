@@ -59,23 +59,12 @@ export default class Level3 extends Phaser.Scene {
     this.player.setBounce(0.2);
     this.player.setCollideWorldBounds(true);
 
-    // ===== CÁMARA =====
     const mapWidth = map.widthInPixels;
     const mapHeight = map.heightInPixels;
 
-    this.physics.world.setBounds(
-      0,
-      0,
-      mapWidth,
-      mapHeight
-    );
+    this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
 
-    this.cameras.main.setBounds(
-      0,
-      0,
-      mapWidth,
-      mapHeight
-    );
+    this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
     this.cameras.main.startFollow(
       this.player,
@@ -86,14 +75,10 @@ export default class Level3 extends Phaser.Scene {
 
     this.cameras.main.setZoom(1.5);
 
-    // ===== ANIMACIONES =====
     if (!this.anims.exists("left")) {
       this.anims.create({
         key: "left",
-        frames: this.anims.generateFrameNumbers(
-          "dude",
-          { start: 0, end: 3 }
-        ),
+        frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
         frameRate: 10,
         repeat: -1,
       });
@@ -106,47 +91,30 @@ export default class Level3 extends Phaser.Scene {
 
       this.anims.create({
         key: "right",
-        frames: this.anims.generateFrameNumbers(
-          "dude",
-          { start: 5, end: 8 }
-        ),
+        frames: this.anims.generateFrameNumbers("dude", { start: 5, end: 8 }),
         frameRate: 10,
         repeat: -1,
       });
     }
 
-    // ===== CONTROLES =====
-    this.cursors =
-      this.input.keyboard.createCursorKeys();
+    this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.keyR =
-      this.input.keyboard.addKey(
-        Phaser.Input.Keyboard.KeyCodes.R
-      );
-
-    // ===== COLISIONES =====
-    wallsLayer.setCollisionByProperty({
-      collides: true,
-    });
-
-    this.physics.add.collider(
-      this.player,
-      wallsLayer
+    this.keyR = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.R
     );
+
+    wallsLayer.setCollisionByProperty({ collides: true });
+
+    this.physics.add.collider(this.player, wallsLayer);
 
     // ===== ESTRELLAS =====
     this.stars = this.physics.add.staticGroup();
 
-    const starsLayer =
-      map.getObjectLayer("Stars");
+    const starsLayer = map.getObjectLayer("Stars");
 
     if (starsLayer) {
       starsLayer.objects.forEach((obj) => {
-        this.stars.create(
-          obj.x,
-          obj.y,
-          "star"
-        );
+        this.stars.create(obj.x, obj.y, "star");
       });
     }
 
@@ -159,22 +127,16 @@ export default class Level3 extends Phaser.Scene {
     );
 
     // ===== GOAL =====
-    const goalLayer =
-      map.getObjectLayer("Goal");
+    const goalLayer = map.getObjectLayer("Goal");
 
-    if (
-      goalLayer &&
-      goalLayer.objects.length > 0
-    ) {
-      const goalObject =
-        goalLayer.objects[0];
+    if (goalLayer && goalLayer.objects.length > 0) {
+      const goalObject = goalLayer.objects[0];
 
-      this.goal =
-        this.physics.add.staticSprite(
-          goalObject.x,
-          goalObject.y,
-          "star"
-        );
+      this.goal = this.physics.add.staticSprite(
+        goalObject.x,
+        goalObject.y,
+        "star"
+      );
 
       this.goal.setTint(0x00ffff);
       this.goal.setScale(1.5);
@@ -187,9 +149,11 @@ export default class Level3 extends Phaser.Scene {
         null,
         this
       );
+
+      // 🔥 NUEVO: animación de aparición
+      this.goal.setScale(0);
     }
 
-    // ===== SCORE (flotante) =====
     this.scoreText = this.add.text(
       this.player.x,
       this.player.y - 40,
@@ -224,20 +188,13 @@ export default class Level3 extends Phaser.Scene {
       this.player.setVelocityY(160);
     }
 
-    // 👇 SCORE SIGUE AL PLAYER
     this.scoreText.setPosition(
       this.player.x,
       this.player.y - 40
     );
 
-    if (
-      Phaser.Input.Keyboard.JustDown(
-        this.keyR
-      )
-    ) {
-      this.scene.restart({
-        score: this.score,
-      });
+    if (Phaser.Input.Keyboard.JustDown(this.keyR)) {
+      this.scene.restart({ score: this.score });
     }
   }
 
@@ -247,6 +204,26 @@ export default class Level3 extends Phaser.Scene {
     this.score += 1;
 
     this.scoreText.setText(`${this.score}`);
+
+    // 🔥 NUEVO: mostrar goal con animación
+    if (this.stars.countActive(true) === 0 && this.goal) {
+      this.goal.setVisible(true);
+
+      this.tweens.add({
+        targets: this.goal,
+        scale: 1.5,
+        duration: 300,
+        ease: "Back.Out"
+      });
+
+      this.tweens.add({
+        targets: this.goal,
+        scale: 1.8,
+        duration: 500,
+        yoyo: true,
+        repeat: -1
+      });
+    }
   }
 
   reachGoal() {
